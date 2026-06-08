@@ -119,15 +119,41 @@ Always organize the layout logically with sub-headings, rich formatting (bold, i
 Never output a plain paragraph wall of text.
 Make extensive use of bold words to anchor readability.`;
 
-    // Execute server-side Gemini call
-    const response = await getGenAI().models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: parts,
-      config: {
-        systemInstruction,
-        temperature: 0.2, // Lower temperature is better for concise & accurate summarization
-      },
-    });
+    // Execute server-side Gemini call with highly robust fallback cascade to handle model overloading or demand spikes
+    const modelsToTry = [
+      "gemini-3.5-flash",
+      "gemini-flash-latest",
+      "gemini-3.1-flash-lite"
+    ];
+
+    let response = null;
+    let fallbackErrors: string[] = [];
+
+    for (const modelName of modelsToTry) {
+      try {
+        console.log(`[API] Attempting summarization using model: ${modelName}`);
+        response = await getGenAI().models.generateContent({
+          model: modelName,
+          contents: parts,
+          config: {
+            systemInstruction,
+            temperature: 0.2, // Lower temperature is better for concise & accurate summarization
+          },
+        });
+        if (response && response.text) {
+          console.log(`[API] Summarization succeeded with model: ${modelName}`);
+          break;
+        }
+      } catch (err: any) {
+        const errMsg = err.message || JSON.stringify(err);
+        console.warn(`[API] Model ${modelName} failed with error:`, errMsg);
+        fallbackErrors.push(`${modelName}: ${errMsg}`);
+      }
+    }
+
+    if (!response || !response.text) {
+      throw new Error(`All Gemini models failed. Errors:\n- ${fallbackErrors.join("\n- ")}`);
+    }
 
     const summaryResult = response.text;
     res.json({ summary: summaryResult });
@@ -139,23 +165,29 @@ Make extensive use of bold words to anchor readability.`;
 
 // Set up Vite or Static files depending on Environment
 async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+  if(!process.env.VERCEL) {
+    if (process.env.NODE_ENV !== "production") {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.join(process.cwd(), "dist");
+      app.use(express.static(distPath));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+    }
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running at http://0.0.0.0:${PORT}`);
     });
   }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running at http://0.0.0.0:${PORT}`);
-  });
 }
 
+// Fire the local server engine
 startServer();
+
+// EXPORT the app instance for Vercel's platform
+export default app;
