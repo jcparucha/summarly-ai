@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx api/server.ts",
+    "dev": "concurrently \"vite --port 3000 --host 0.0.0.0\" \"PORT=3001 nodemon --exec tsx api/server.ts\"",
     "build": "vite build",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist server.js",
@@ -27,8 +27,11 @@
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^10.0.3",
     "esbuild": "^0.25.0",
+    "nodemon": "^3.1.14",
     "tailwindcss": "^4.1.14",
+    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.3"
