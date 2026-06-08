@@ -1,20 +1,11 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Summarly AI
 
-# Run and deploy your AI Studio app
+Summarize text or uploaded files (documents, text, images) instantly. Get key points by topic in custom-formatted styles with easy plaintext and markdown copy options.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/820f1397-a57d-4e2f-ba5b-b01b6088af46
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **Pristine Document & Image Ingestion**: Support for text copy-pasting and document uploads (PDF, text, JPEG, PNG).
+- **Gemini 3.5 Flash Powered**: Fast and accurate executive digestion.
+- **Custom-Formatted Formats**: Seamlessly view and structure formatted insights or raw markdown models.
+- **Efficient & Compact Outputs**: Check the output efficiency directly to understand compression achievements.
+- **Intuitive Visual Theme**: Comfortable day or night themes configured with responsive layouts.
