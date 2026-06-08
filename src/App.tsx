@@ -762,7 +762,8 @@ export default function App() {
                       onDragOver={handleDrag}
                       onDragLeave={handleDrag}
                       onDrop={handleDrop}
-                      className={`w-full border-2 border-dashed rounded-xl p-8 transition-all duration-200 flex flex-col items-center text-center gap-3 ${
+                      onClick={onButtonClick}
+                      className={`w-full border-2 border-dashed rounded-xl p-8 transition-all duration-200 flex flex-col items-center text-center gap-3 cursor-pointer group ${
                         isDragActive
                           ? theme === "light"
                             ? "border-cyan-500 bg-cyan-50/50"
@@ -780,14 +781,13 @@ export default function App() {
                         <UploadCloud className="w-8 h-8 animate-pulse" />
                       </div>
                       <div>
-                        <button
-                          onClick={onButtonClick}
-                          className={`text-sm font-bold transition-colors cursor-pointer ${
-                            theme === "light" ? "text-cyan-600 hover:text-cyan-705" : "text-cyan-400 hover:text-cyan-300"
+                        <span
+                          className={`text-sm font-bold transition-colors ${
+                            theme === "light" ? "text-cyan-600 group-hover:text-cyan-705" : "text-cyan-400 group-hover:text-cyan-300"
                           }`}
                         >
                           Choose a record file
-                        </button>
+                        </span>
                         <p className={`text-xs mt-1 transition-colors ${theme === "light" ? "text-slate-400" : "text-slate-500"}`}>or drag & drop your document here</p>
                       </div>
                       <span className={`text-[9px] tracking-wider uppercase font-bold transition-colors ${
