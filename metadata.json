@@ -1,0 +1,8 @@
+{
+  "name": "Summarly AI v1",
+  "description": "Summarize text or uploaded files (documents, text, images) instantly. Get key points by topic in custom-formatted styles with easy plain-text and markdown copy options.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
