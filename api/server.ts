@@ -158,7 +158,20 @@ Make extensive use of bold words to anchor readability.`;
     res.json({ summary: summaryResult });
   } catch (error: any) {
     console.error("Gemini Summarization Error:", error);
-    res.status(500).json({ error: error.message || "An unexpected error occurred during summarization." });
+    
+    // Detect if this error or any underlying fallback model error is a 429 / Resource Exhausted / Rate limit error
+    const errText = error.message || JSON.stringify(error) || "";
+    const isRateLimited = 
+      error.status === 429 || 
+      error.statusCode === 429 || 
+      /429|RESOURCE_EXHAUSTED|quota|too many requests/i.test(errText);
+      
+    const statusCode = isRateLimited ? 429 : 500;
+    
+    res.status(statusCode).json({ 
+      status: statusCode,
+      error: error.message || "An unexpected error occurred during summarization." 
+    });
   }
 });
 

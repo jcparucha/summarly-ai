@@ -43,6 +43,21 @@ export default function App() {
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [countdown, setCountdown] = useState<number>(0);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     const cached = localStorage.getItem("summarly_theme");
@@ -302,24 +317,29 @@ export default function App() {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || `Server responded with status ${response.status}`);
+        const err = new Error(errData.error || `Server responded with status ${response.status}`);
+        (err as any).status = response.status;
+        throw err;
       }
-
+ 
       const data = await response.json();
       if (!data.summary) {
-        throw new Error("No summary content returned from server.");
+        const err = new Error("No summary content returned from server.");
+        (err as any).status = 500; // Treated as server response failure
+        throw err;
       }
-
+ 
       setSummaryResult(data.summary);
       setOutputTab("formatted");
-
+      setCountdown(20);
+ 
       // Decrement dynamic Gemini Flash quota allowance remaining
       setRemainingUploads((prev) => {
         const nextVal = Math.max(0, prev - 1);
         localStorage.setItem("summarly_remaining_uploads", nextVal.toString());
         return nextVal;
       });
-
+ 
       // Save to recent logs history
       const title = extractTitle(data.summary);
       const newHistoryItem: SummaryHistoryItem = {
@@ -333,13 +353,25 @@ export default function App() {
         originalText: sourceText,
         options: { ...options },
       };
-
+ 
       const updatedHistory = [newHistoryItem, ...history.slice(0, 49)]; // Limit to past 50 items
       saveHistoryToLocalStorage(updatedHistory);
       setSelectedHistoryId(newHistoryItem.id);
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(err.message || "An error occurred while summoning Gemini to summarize.");
+      const status = err.status;
+      if (status) {
+        if (status === 429) {
+          setErrorMessage("The app is currently experiencing high traffic. Please try again in a few seconds!");
+        } else if (status >= 500) {
+          setErrorMessage("Internal Server Error");
+        } else {
+          setErrorMessage("Something went wrong");
+        }
+      } else {
+        // Fallback for network connect errors/exceptions or parsing error
+        setErrorMessage("Something went wrong");
+      }
     } finally {
       setIsLoading(false);
       setStatusMessage("");
@@ -763,27 +795,27 @@ export default function App() {
                       onDragLeave={handleDrag}
                       onDrop={handleDrop}
                       onClick={onButtonClick}
-                      className={`w-full border-2 border-dashed rounded-xl p-8 transition-all duration-200 flex flex-col items-center text-center gap-3 cursor-pointer group ${
+                      className={`w-full border-2 border-dashed rounded-xl p-8 transition-all duration-200 flex flex-col items-center text-center gap-3 cursor-pointer select-none group ${
                         isDragActive
                           ? theme === "light"
                             ? "border-cyan-500 bg-cyan-50/50"
                             : "border-cyan-500 bg-cyan-950/20"
                           : theme === "light"
                           ? "border-slate-200 hover:border-cyan-500 bg-slate-50/50 hover:bg-slate-50"
-                          : "border-white/10 hover:border-cyan-500/40 bg-white/[0.01]"
+                          : "border-white/10 hover:border-cyan-500/40 bg-white/[0.01] hover:bg-white/[0.03]"
                       }`}
                     >
-                      <div className={`p-3.5 rounded-full shadow-inner border transition-colors ${
+                      <div className={`p-3.5 rounded-full shadow-inner border transition-all duration-200 ${
                         theme === "light"
-                          ? "bg-cyan-50 text-cyan-650 border-cyan-100"
-                          : "bg-cyan-950 text-cyan-400 border-cyan-500/20"
+                          ? "bg-cyan-50 text-cyan-650 border-cyan-100 group-hover:bg-cyan-100/70"
+                          : "bg-cyan-950 text-cyan-400 border-cyan-500/20 group-hover:bg-cyan-900/30"
                       }`}>
                         <UploadCloud className="w-8 h-8 animate-pulse" />
                       </div>
                       <div>
                         <span
                           className={`text-sm font-bold transition-colors ${
-                            theme === "light" ? "text-cyan-600 group-hover:text-cyan-705" : "text-cyan-400 group-hover:text-cyan-300"
+                            theme === "light" ? "text-cyan-600 group-hover:text-cyan-700" : "text-cyan-400 group-hover:text-cyan-300"
                           }`}
                         >
                           Choose a record file
@@ -854,43 +886,45 @@ export default function App() {
               )}
             </div>
 
-            {/* Gemini Flash Upload Allowance State Indicator */}
-            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center md:flex-col md:items-stretch lg:flex-row lg:items-center justify-between gap-3 text-xs transition-all duration-300 shadow-md ${quotaBorderColor} ${quotaBgColor} ${
-              theme === "light" ? "shadow-slate-100/40" : "shadow-black/25"
-            }`}>
-              <div className="flex items-center gap-2.5">
-                <span className="relative flex h-2 w-2">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${quotaDotColor} opacity-75`}></span>
-                  <span className={`relative inline-flex rounded-full h-2 w-2 ${quotaDotColor}`}></span>
-                </span>
-                <div>
-                  <p className={`font-semibold ${theme === "light" ? "text-slate-800" : "text-slate-200"}`}>Allowance Capacity Status</p>
-                  <p className={`text-[10px] mt-0.5 font-medium ${quotaTextColor}`}>{quotaStatusText}</p>
+            {/* Gemini Flash Upload Allowance State Indicator - TEMPORARILY HIDDEN */}
+            {false && (
+              <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center md:flex-col md:items-stretch lg:flex-row lg:items-center justify-between gap-3 text-xs transition-all duration-300 shadow-md ${quotaBorderColor} ${quotaBgColor} ${
+                theme === "light" ? "shadow-slate-100/40" : "shadow-black/25"
+              }`}>
+                <div className="flex items-center gap-2.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${quotaDotColor} opacity-75`}></span>
+                    <span className={`relative inline-flex rounded-full h-2 w-2 ${quotaDotColor}`}></span>
+                  </span>
+                  <div>
+                    <p className={`font-semibold ${theme === "light" ? "text-slate-800" : "text-slate-200"}`}>Allowance Capacity Status</p>
+                    <p className={`text-[10px] mt-0.5 font-medium ${quotaTextColor}`}>{quotaStatusText}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 self-end sm:self-auto md:self-stretch md:justify-between lg:self-auto">
+                  <span className={`font-mono px-2.5 py-1 rounded-lg border text-[11px] font-bold ${
+                    theme === "light"
+                      ? "bg-slate-100 border-slate-200 text-slate-700"
+                      : "bg-black/40 border-white/5 text-slate-300"
+                  }`}>
+                    {remainingUploads} / 15 remaining
+                  </span>
+                  {remainingUploads < 15 && (
+                    <button
+                      onClick={resetQuota}
+                      className={`text-[10px] font-extrabold px-2.5 py-1 border rounded-lg transition-colors uppercase cursor-pointer tracking-wider ${
+                        theme === "light"
+                          ? "bg-white border-slate-200 text-cyan-600 hover:bg-slate-50 hover:text-cyan-705"
+                          : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-cyan-400 hover:text-cyan-300"
+                      }`}
+                      title="Restore remaining uploads capacity to full"
+                    >
+                      Reset Quota
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-3 self-end sm:self-auto md:self-stretch md:justify-between lg:self-auto">
-                <span className={`font-mono px-2.5 py-1 rounded-lg border text-[11px] font-bold ${
-                  theme === "light"
-                    ? "bg-slate-100 border-slate-200 text-slate-700"
-                    : "bg-black/40 border-white/5 text-slate-300"
-                }`}>
-                  {remainingUploads} / 15 remaining
-                </span>
-                {remainingUploads < 15 && (
-                  <button
-                    onClick={resetQuota}
-                    className={`text-[10px] font-extrabold px-2.5 py-1 border rounded-lg transition-colors uppercase cursor-pointer tracking-wider ${
-                      theme === "light"
-                        ? "bg-white border-slate-200 text-cyan-600 hover:bg-slate-50 hover:text-cyan-700"
-                        : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-cyan-400 hover:text-cyan-300"
-                    }`}
-                    title="Restore remaining uploads capacity to full"
-                  >
-                    Reset Quota
-                  </button>
-                )}
-              </div>
-            </div>
+            )}
 
             {/* Privacy Disclaimer and Usage Warning (Gemini Free tier) */}
             <div className={`rounded-2xl p-4 flex gap-3 shadow-md ${
@@ -1002,7 +1036,7 @@ export default function App() {
             {/* COMPOSER SUBMIT BUTTON */}
             <button
               onClick={handleSummarizeSubmit}
-              disabled={isLoading || (!sourceText.trim() && !uploadedFile)}
+              disabled={isLoading || (!sourceText.trim() && !uploadedFile) || countdown > 0}
               className={`w-full bg-gradient-to-r from-cyan-600 to-blue-700 hover:scale-[1.01] hover:from-cyan-500 hover:to-blue-600 text-white font-bold text-sm py-4 rounded-xl shadow-lg cursor-pointer transition-all duration-250 flex items-center justify-center gap-2 transform active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 ${
                 theme === "light"
                   ? "shadow-[0_4px_20px_rgba(8,145,178,0.15)] hover:shadow-[0_4px_25px_rgba(8,145,178,0.25)]"
@@ -1014,6 +1048,11 @@ export default function App() {
                   <RefreshCw className="w-5 h-5 animate-spin text-cyan-200" />
                   <span className="font-semibold tracking-wide text-cyan-50">AI summarization in progress...</span>
                 </>
+              ) : countdown > 0 ? (
+                <>
+                  <Sparkles className="w-5 h-5 text-cyan-100 opacity-40 animate-pulse" />
+                  <span className="font-bold uppercase tracking-wider text-white/70">Cooldown Active</span>
+                </>
               ) : (
                 <>
                   <Sparkles className="w-5 h-5 text-cyan-100" />
@@ -1021,6 +1060,22 @@ export default function App() {
                 </>
               )}
             </button>
+
+            {/* Countdown timer below the button */}
+            {countdown > 0 && (
+              <div className={`text-center text-xs font-semibold py-1 flex items-center justify-center gap-1.5 transition-all duration-300 ${
+                theme === "light" ? "text-cyan-600/90" : "text-cyan-400/90"
+              }`}>
+                <span>Next generation available in</span>
+                <span className={`font-bold font-mono px-1.5 py-0.5 rounded-md border text-[11px] ${
+                  theme === "light"
+                    ? "bg-slate-50 border-slate-200 text-slate-800"
+                    : "bg-black/30 border-white/5 text-slate-200"
+                }`}>
+                  {countdown}s
+                </span>
+              </div>
+            )}
 
             {/* STATUS DIALOG BOX & EXCEPTION LOGS */}
             <AnimatePresence>
