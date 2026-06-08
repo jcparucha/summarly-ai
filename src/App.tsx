@@ -42,6 +42,7 @@ export default function App() {
   const [historySearch, setHistorySearch] = useState("");
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     const cached = localStorage.getItem("summarly_theme");
@@ -430,46 +431,66 @@ export default function App() {
         : "bg-[#05060a] text-slate-100 theme-dark selection:bg-cyan-500/20 selection:text-cyan-200"
     }`}>
       {/* Upper Navigation Rail */}
-      <header className={`sticky top-0 z-40 backdrop-blur-md px-8 py-5 flex items-center justify-between shadow-sm transition-colors duration-200 ${
+      <header className={`sticky top-0 z-40 backdrop-blur-md px-6 md:px-8 py-4 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm transition-colors duration-200 ${
         theme === "light" ? "bg-white/70 border-b border-slate-200/80" : "bg-white/[0.02] border-b border-white/5"
       }`}>
-        <div className="flex items-center gap-4">
-          <div className="w-9 h-9 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.4)]">
-            <Sparkles className="w-5 h-5 text-white animate-pulse" id="header_spark_icon" />
+        <div className="flex items-center justify-between w-full md:w-auto gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-9 h-9 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.4)] shrink-0">
+              <Sparkles className="w-5 h-5 text-white animate-pulse" id="header_spark_icon" />
+            </div>
+            <div>
+              <h1 className={`text-lg font-bold tracking-tight flex items-center gap-1.5 transition-colors ${
+                theme === "light" ? "text-slate-900" : "text-white"
+              }`}>
+                Summarly <span className="text-cyan-500 font-medium">AI</span>
+              </h1>
+              <p className={`text-xs font-medium transition-colors ${theme === "light" ? "text-slate-500" : "text-slate-400"}`}>
+                Powering premium text & file digestion via Gemini Flash
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className={`text-lg font-bold tracking-tight flex items-center gap-1.5 transition-colors ${
-              theme === "light" ? "text-slate-900" : "text-white"
-            }`}>
-              Summarly <span className="text-cyan-500 font-medium">AI</span>
-            </h1>
-            <p className={`text-xs font-medium transition-colors ${theme === "light" ? "text-slate-500" : "text-slate-400"}`}>
-              Powering premium text & file digestion via Gemini Flash
-            </p>
+
+          {/* Light/Dark Toggle Button for Mobile Only */}
+          <div className="block md:hidden">
+            <button
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                theme === "light"
+                  ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
+                  : "bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/[0.06] hover:text-white"
+              }`}
+              title={`Switch to ${theme === "light" ? "Dark Mode" : "Light Mode"}`}
+            >
+              {theme === "light" ? <Moon className="w-4 h-4 text-cyan-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Light/Dark Toggle Button */}
-          <button
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-center ${
-              theme === "light"
-                ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
-                : "bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/[0.06] hover:text-white"
-            }`}
-            title={`Switch to ${theme === "light" ? "Dark Mode" : "Light Mode"}`}
-          >
-            {theme === "light" ? <Moon className="w-4 h-4 text-cyan-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
-          </button>
-
-          <div className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all ${
+        <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto">
+          {/* Gemini 3.5 Flash Active Badge (on mobile it's on bottom left, or full width row, nice pill) */}
+          <div className={`flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all w-full md:w-auto ${
             theme === "light"
               ? "bg-cyan-50 text-cyan-700 border-cyan-200/80"
               : "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
           }`}>
             <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${theme === "light" ? "bg-cyan-500" : "bg-cyan-400"}`}></span>
             Gemini 3.5 Flash Active
+          </div>
+
+          {/* Light/Dark Toggle Button for Desktop Only */}
+          <div className="hidden md:block">
+            <button
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                theme === "light"
+                  ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
+                  : "bg-white/[0.02] border-white/5 text-slate-300 hover:bg-white/[0.06] hover:text-white"
+              }`}
+              title={`Switch to ${theme === "light" ? "Dark Mode" : "Light Mode"}`}
+            >
+              {theme === "light" ? <Moon className="w-4 h-4 text-cyan-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
+            </button>
           </div>
         </div>
       </header>
@@ -479,115 +500,151 @@ export default function App() {
         <div className="absolute top-1/4 -right-10 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+        <div className="grid grid-cols-12 gap-4 sm:gap-6 md:gap-8 relative z-10">
           
-          {/* LEFT RECENT LOGS HISTORIES (3 columns grid layout) */}
-          <div className={`lg:col-span-3 lg:border-r lg:pr-6 flex flex-col gap-4 max-h-[85vh] transition-colors ${
-            theme === "light" ? "lg:border-slate-200" : "lg:border-white/5"
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className={`flex items-center gap-2 font-semibold text-sm transition-colors ${
-                theme === "light" ? "text-slate-700" : "text-slate-300"
-              }`}>
-                <History className="w-4 h-4 text-cyan-500" />
-                <span>Recent Summaries</span>
-                <span className={`text-[10px] border px-2 py-0.5 rounded-full font-bold transition-colors ${
-                  theme === "light" ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/[0.06] border-white/5 text-slate-300"
-                }`}>{history.length}</span>
-              </div>
-              {history.length > 0 && (
-                <button
-                  onClick={clearAllHistory}
-                  className="text-xs text-rose-500 hover:text-rose-605 font-bold flex items-center gap-1 transition-colors duration-150 cursor-pointer"
-                  title="Purge logs"
+          {/* Recent History Floating Slider Drawer with backdrop overlay */}
+          <AnimatePresence>
+            {isSidebarOpen && (
+              <>
+                {/* Backdrop cover overlay */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="fixed inset-0 bg-slate-900/25 dark:bg-black/60 backdrop-blur-[1.5px] z-40 cursor-pointer"
+                />
+
+                {/* Main Drawer Card */}
+                <motion.div
+                  initial={{ opacity: 0, x: "100%" }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: "100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                  className={`fixed top-24 right-4 sm:right-6 lg:right-8 bottom-6 sm:bottom-8 w-80 sm:w-96 z-50 flex flex-col gap-4 p-5 rounded-2xl border shadow-2xl backdrop-blur-md ${
+                    theme === "light"
+                      ? "bg-white/95 border-slate-200/90 text-slate-800 shadow-slate-200/50"
+                      : "bg-[#090b11]/95 border-white/10 text-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
+                  }`}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Clear All</span>
-                </button>
-              )}
-            </div>
-
-            {/* History Search */}
-            <input
-              type="text"
-              placeholder="Search recent summaries..."
-              value={historySearch}
-              onChange={(e) => setHistorySearch(e.target.value)}
-              className={`w-full text-xs px-3 py-2.5 rounded-lg border transition-all duration-200 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 shadow-sm ${
-                theme === "light"
-                  ? "bg-white border-slate-200 text-slate-800 placeholder:text-slate-400"
-                  : "bg-white/[0.03] border-white/10 text-slate-200 placeholder:text-slate-500"
-              }`}
-              maxLength={60}
-            />
-
-            {/* List log drawer */}
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-              <AnimatePresence initial={false}>
-                {filteredHistory.length > 0 ? (
-                  filteredHistory.map((item) => {
-                    const isSelected = selectedHistoryId === item.id;
-                    return (
-                      <motion.div
-                        key={item.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, x: -50 }}
-                        className={`group relative p-3.5 rounded-xl border text-left cursor-pointer transition-all duration-200 ${
-                          isSelected
-                            ? theme === "light"
-                              ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-900 shadow-sm"
-                              : "bg-cyan-500/10 border-cyan-500/30 text-cyan-200 shadow-[0_0_15px_rgba(34,211,238,0.1)]"
-                            : theme === "light"
-                            ? "bg-white border-slate-200 text-slate-700 hover:border-cyan-500/30 hover:bg-slate-50/80"
-                            : "bg-white/[0.01] border-white/5 text-slate-300 hover:border-cyan-500/30 hover:bg-white/[0.03]"
-                        }`}
-                        onClick={() => loadHistoryItem(item)}
+                  <div className="flex items-center justify-between gap-1">
+                    <div className={`flex items-center gap-1.5 font-semibold transition-colors min-w-0 ${
+                      theme === "light" ? "text-slate-700" : "text-slate-300"
+                    }`}>
+                      <History className="w-4 h-4 text-cyan-500 flex-shrink-0" />
+                      <span className="text-[10px] sm:text-xs md:text-sm truncate font-bold">Recent Summaries</span>
+                      <span className={`text-[10px] border px-1.5 py-0.5 rounded-full font-bold transition-colors ${
+                        theme === "light" ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/[0.06] border-white/5 text-slate-300"
+                      }`}>{history.length}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {history.length > 0 && (
+                        <button
+                          onClick={clearAllHistory}
+                          className="text-rose-500 hover:text-rose-600 font-bold flex items-center gap-1 transition-colors duration-150 cursor-pointer flex-shrink-0 text-[10px]"
+                          title="Purge logs"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline font-bold">Clear</span>
+                        </button>
+                      )}
+                      {/* Close button inside sidebar */}
+                      <button
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                        title="Collapse recent summaries"
                       >
-                        <div className="flex items-start justify-between gap-1">
-                          <span className={`text-xs font-semibold line-clamp-1 group-hover:text-cyan-500 transition-colors ${
-                            isSelected 
-                              ? theme === "light" ? "text-cyan-900" : "text-cyan-300" 
-                              : theme === "light" ? "text-slate-800" : "text-slate-300"
-                          }`}>
-                            {item.title}
-                          </span>
-                          <button
-                            onClick={(e) => deleteHistoryItem(item.id, e)}
-                            className="text-slate-400 hover:text-rose-500 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 focus:opacity-100"
-                            title="Delete log item"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                        <div className={`flex items-center gap-1.5 mt-2.5 text-[10px] transition-colors ${
-                          theme === "light" ? "text-slate-400 group-hover:text-slate-500" : "text-slate-500 group-hover:text-slate-400"
-                        }`}>
-                          <FileText className={`w-3 h-3 ${isSelected ? "text-cyan-500" : "text-indigo-500/80"}`} />
-                          <span>{item.sourceType === "file" ? "File OCR" : "Copypasta"}</span>
-                          <span>•</span>
-                          <span>{item.timestamp}</span>
-                        </div>
-                      </motion.div>
-                    );
-                  })
-                ) : (
-                  <div className={`border border-dashed rounded-xl p-5 text-center text-xs mt-2 transition-colors ${
-                    theme === "light" ? "bg-slate-50 border-slate-200 text-slate-400" : "bg-white/[0.01] border-white/5 text-slate-500"
-                  }`}>
-                    <History className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                    <span>No summaries compiled yet. History persists locally.</span>
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
 
-          {/* RIGHT / MIDDLE MAIN COMPILER DIVISION (5 columns source + options) */}
-          <div className="lg:col-span-12 xl:col-span-5 flex flex-col gap-6">
+                  {/* History Search */}
+                  <input
+                    type="text"
+                    placeholder="Search recent summaries..."
+                    value={historySearch}
+                    onChange={(e) => setHistorySearch(e.target.value)}
+                    className={`w-full text-xs px-3 py-2.5 rounded-lg border transition-all duration-200 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 shadow-sm ${
+                      theme === "light"
+                        ? "bg-white border-slate-200 text-slate-800 placeholder:text-slate-400"
+                        : "bg-white/[0.03] border-white/10 text-slate-200 placeholder:text-slate-500"
+                    }`}
+                    maxLength={60}
+                  />
+
+                  {/* List log drawer */}
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                    <AnimatePresence initial={false}>
+                      {filteredHistory.length > 0 ? (
+                        filteredHistory.map((item) => {
+                          const isSelected = selectedHistoryId === item.id;
+                          return (
+                            <motion.div
+                              key={item.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, x: -50 }}
+                              className={`group relative p-3.5 rounded-xl border text-left cursor-pointer transition-all duration-200 ${
+                                isSelected
+                                  ? theme === "light"
+                                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-900 shadow-sm"
+                                    : "bg-cyan-500/10 border-cyan-500/30 text-cyan-200 shadow-[0_0_15px_rgba(34,211,238,0.1)]"
+                                  : theme === "light"
+                                  ? "bg-white border-slate-200 text-slate-700 hover:border-cyan-500/30 hover:bg-slate-50/80"
+                                  : "bg-white/[0.01] border-white/5 text-slate-300 hover:border-cyan-500/30 hover:bg-white/[0.03]"
+                              }`}
+                              onClick={() => loadHistoryItem(item)}
+                            >
+                              <div className="flex items-start justify-between gap-1">
+                                <span className={`text-xs font-semibold line-clamp-1 group-hover:text-cyan-500 transition-colors ${
+                                  isSelected 
+                                    ? theme === "light" ? "text-cyan-900" : "text-cyan-300" 
+                                    : theme === "light" ? "text-slate-800" : "text-slate-300"
+                                }`}>
+                                  {item.title}
+                                </span>
+                                <button
+                                  onClick={(e) => deleteHistoryItem(item.id, e)}
+                                  className="text-slate-400 hover:text-rose-500 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 focus:opacity-100"
+                                  title="Delete log item"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                              <div className={`flex items-center gap-1.5 mt-2.5 text-[10px] transition-colors ${
+                                theme === "light" ? "text-slate-400 group-hover:text-slate-500" : "text-slate-500 group-hover:text-slate-400"
+                              }`}>
+                                <FileText className={`w-3 h-3 ${isSelected ? "text-cyan-500" : "text-indigo-500/80"}`} />
+                                <span>{item.sourceType === "file" ? "File OCR" : "Copypasta"}</span>
+                                <span>•</span>
+                                <span>{item.timestamp}</span>
+                              </div>
+                            </motion.div>
+                          );
+                        })
+                      ) : (
+                        <div className={`border border-dashed rounded-xl p-5 text-center text-xs mt-2 transition-colors ${
+                          theme === "light" ? "bg-slate-50 border-slate-200 text-slate-400" : "bg-white/[0.01] border-white/5 text-slate-500"
+                        }`}>
+                          <History className="w-8 h-8 text-slate-500 mx-auto mb-2" />
+                          <span>No summaries compiled yet. History persists locally.</span>
+                        </div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* LEFT MAIN COMPILER DIVISION (5 columns source + options) */}
+          <div className="col-span-12 md:col-span-5 order-1 flex flex-col gap-6 transition-all duration-300">
             
+
+
             {/* INGESTION TYPE TOGGLE */}
-            <div className={`p-1.5 rounded-xl border shadow-inner flex gap-1.5 transition-colors ${
+            <div className={`p-1.5 rounded-xl border shadow-inner flex flex-col sm:flex-row md:flex-col lg:flex-row gap-1.5 transition-colors ${
               theme === "light" ? "bg-slate-200/50 border-slate-200/80" : "bg-white/[0.02] border-white/5"
             }`}>
               <button
@@ -595,7 +652,7 @@ export default function App() {
                   setInputMode("text");
                   setErrorMessage(null);
                 }}
-                className={`flex-1 py-3 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex-1 py-2.5 sm:py-3 md:py-2.5 lg:py-3 px-3 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer text-center ${
                   inputMode === "text"
                     ? "bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-[0_4px_15px_rgba(8,145,178,0.25)]"
                     : theme === "light"
@@ -610,7 +667,7 @@ export default function App() {
                   setInputMode("file");
                   setErrorMessage(null);
                 }}
-                className={`flex-1 py-3 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex-1 py-2.5 sm:py-3 md:py-2.5 lg:py-3 px-3 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer text-center ${
                   inputMode === "file"
                     ? "bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-[0_4px_15px_rgba(8,145,178,0.25)]"
                     : theme === "light"
@@ -671,12 +728,12 @@ export default function App() {
                   </div>
 
                   {/* Clipboard action bar */}
-                  <div className={`flex items-center justify-between border-t pt-3 transition-colors ${
+                  <div className={`flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between md:flex-col md:items-stretch lg:flex-row lg:items-center lg:justify-between border-t pt-3 transition-colors ${
                     theme === "light" ? "border-slate-100" : "border-white/5"
                   }`}>
                     <button
                       onClick={handlePasteFromClipboard}
-                      className={`px-3 py-1.5 border text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors duration-150 cursor-pointer ${
+                      className={`px-3 py-1.5 border text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors duration-150 cursor-pointer ${
                         theme === "light"
                           ? "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700"
                           : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-slate-200"
@@ -687,7 +744,7 @@ export default function App() {
                       <span>Paste clipboard info</span>
                     </button>
                     
-                    <div className={`flex items-center gap-3 text-[10px] font-medium uppercase tracking-widest font-mono transition-colors ${
+                    <div className={`flex items-center justify-center sm:justify-end md:justify-center lg:justify-end gap-3 text-[10px] font-medium uppercase tracking-widest font-mono transition-colors ${
                       theme === "light" ? "text-slate-400" : "text-slate-500"
                     }`}>
                       <span>{charCount} chars</span>
@@ -798,7 +855,7 @@ export default function App() {
             </div>
 
             {/* Gemini Flash Upload Allowance State Indicator */}
-            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition-all duration-300 shadow-md ${quotaBorderColor} ${quotaBgColor} ${
+            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center md:flex-col md:items-stretch lg:flex-row lg:items-center justify-between gap-3 text-xs transition-all duration-300 shadow-md ${quotaBorderColor} ${quotaBgColor} ${
               theme === "light" ? "shadow-slate-100/40" : "shadow-black/25"
             }`}>
               <div className="flex items-center gap-2.5">
@@ -811,7 +868,7 @@ export default function App() {
                   <p className={`text-[10px] mt-0.5 font-medium ${quotaTextColor}`}>{quotaStatusText}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 self-end sm:self-auto">
+              <div className="flex items-center gap-3 self-end sm:self-auto md:self-stretch md:justify-between lg:self-auto">
                 <span className={`font-mono px-2.5 py-1 rounded-lg border text-[11px] font-bold ${
                   theme === "light"
                     ? "bg-slate-100 border-slate-200 text-slate-700"
@@ -870,7 +927,7 @@ export default function App() {
                   <select
                     value={options.format}
                     onChange={(e) => setOptions({ ...options, format: e.target.value as any })}
-                    className={`text-xs border rounded-lg px-2.5 py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
+                    className={`text-xs border rounded-lg pl-2 pr-7 py-2 md:pl-3 md:pr-8 md:py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
                       theme === "light"
                         ? "bg-white border-slate-200 text-slate-800 hover:bg-slate-50"
                         : "bg-white/[0.03] border-white/10 text-slate-200 hover:bg-white/[0.05]"
@@ -889,7 +946,7 @@ export default function App() {
                   <select
                     value={options.length}
                     onChange={(e) => setOptions({ ...options, length: e.target.value as any })}
-                    className={`text-xs border rounded-lg px-2.5 py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
+                    className={`text-xs border rounded-lg pl-2 pr-7 py-2 md:pl-3 md:pr-8 md:py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
                       theme === "light"
                         ? "bg-white border-slate-200 text-slate-800 hover:bg-slate-50"
                         : "bg-white/[0.03] border-white/10 text-slate-200 hover:bg-white/[0.05]"
@@ -907,7 +964,7 @@ export default function App() {
                   <select
                     value={options.focus}
                     onChange={(e) => setOptions({ ...options, focus: e.target.value as any })}
-                    className={`text-xs border rounded-lg px-2.5 py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
+                    className={`text-xs border rounded-lg pl-2 pr-7 py-2 md:pl-3 md:pr-8 md:py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
                       theme === "light"
                         ? "bg-white border-slate-200 text-slate-800 hover:bg-slate-50"
                         : "bg-white/[0.03] border-white/10 text-slate-200 hover:bg-white/[0.05]"
@@ -926,7 +983,7 @@ export default function App() {
                   <select
                     value={options.tone}
                     onChange={(e) => setOptions({ ...options, tone: e.target.value as any })}
-                    className={`text-xs border rounded-lg px-2.5 py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
+                    className={`text-xs border rounded-lg pl-2 pr-7 py-2 md:pl-3 md:pr-8 md:py-2.5 font-medium focus:outline-none focus:border-cyan-500/55 transition-all cursor-pointer ${
                       theme === "light"
                         ? "bg-white border-slate-200 text-slate-800 hover:bg-slate-50"
                         : "bg-white/[0.03] border-white/10 text-slate-200 hover:bg-white/[0.05]"
@@ -1001,12 +1058,11 @@ export default function App() {
             </AnimatePresence>
           </div>
 
-          {/* CENTRALIZED SUMMARIZED OUTPUT BLOCK (4 columns summary display) */}
-          <div className="lg:col-span-12 xl:col-span-4 flex flex-col gap-4">
-            
-            {/* Header Tabs */}
+          {/* MIDDLE SUMMARIZED OUTPUT BLOCK (collapsible layout details) */}
+          <div className="col-span-12 md:col-span-7 order-2 flex flex-col gap-4 transition-all duration-300">
+                 {/* Header Tabs */}
             {summaryResult ? (
-              <div className={`flex items-center justify-between border-b pb-3 transition-colors ${
+              <div className={`flex flex-row items-center justify-between gap-3 border-b pb-3 transition-colors ${
                 theme === "light" ? "border-slate-200" : "border-white/5"
               }`}>
                 <div className={`flex p-1 rounded-xl border transition-colors ${
@@ -1040,49 +1096,51 @@ export default function App() {
                   </button>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
+                  {/* Toggle Sidebar Icon Button */}
                   <button
-                    onClick={() => handleCopyToClipboard("markdown")}
-                    className={`p-2 border rounded-lg text-[10px] font-bold shadow-sm transition-colors flex items-center gap-1 cursor-pointer ${
-                      theme === "light"
-                        ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-cyan-600"
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className={`p-2 border rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                      isSidebarOpen
+                        ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-400 font-extrabold shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+                        : theme === "light"
+                        ? "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-cyan-600"
                         : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.07] hover:text-cyan-400"
                     }`}
-                    title="Copy Raw Markdown code"
+                    title={isSidebarOpen ? "Collapse Recent Summaries" : "Expand Recent Summaries"}
                   >
-                    {copiedType === "markdown" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>MD</span>
-                  </button>
-                  <button
-                    onClick={() => handleCopyToClipboard("plain")}
-                    className={`p-2 border rounded-lg text-[10px] font-bold shadow-sm transition-colors flex items-center gap-1 cursor-pointer ${
-                      theme === "light"
-                        ? "bg-white border-slate-200 text-slate-705 hover:bg-slate-50 hover:text-cyan-600"
-                        : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.07] hover:text-cyan-400"
-                    }`}
-                    title="Copy clean normalized text"
-                  >
-                    {copiedType === "plain" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>Text</span>
-                  </button>
-                  <button
-                    onClick={handleDownloadFile}
-                    className={`p-2 border rounded-lg shadow-sm transition-colors cursor-pointer ${
-                      theme === "light"
-                        ? "bg-white border-slate-200 text-cyan-600 hover:bg-slate-50 hover:text-cyan-700"
-                        : "bg-white/[0.03] border-white/10 text-cyan-400 hover:bg-cyan-950/20"
-                    }`}
-                    title="Download summary report (.md)"
-                  >
-                    <FileDown className="w-3.5 h-3.5" />
+                    <History className={`w-3.5 h-3.5 ${isSidebarOpen ? "animate-pulse text-cyan-400" : ""}`} />
+                    <span className="text-[10px] font-bold">
+                      <span className="hidden xl:inline">History </span>({history.length})
+                    </span>
                   </button>
                 </div>
               </div>
             ) : (
-              <div className={`text-xs font-bold uppercase tracking-widest font-mono transition-colors ${
-                theme === "light" ? "text-slate-400" : "text-slate-500"
+              <div className={`flex flex-row items-center justify-between gap-3 border-b pb-3 transition-colors ${
+                theme === "light" ? "border-slate-200" : "border-white/5"
               }`}>
-                Summarization Output Workspace
+                <div className={`text-xs font-bold uppercase tracking-widest font-mono transition-colors ${
+                  theme === "light" ? "text-slate-400" : "text-slate-500"
+                }`}>
+                  Summarization Output Workspace
+                </div>
+                <button
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className={`p-2 border rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    isSidebarOpen
+                      ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-400 font-extrabold shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+                      : theme === "light"
+                      ? "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-cyan-600"
+                      : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.07] hover:text-cyan-400"
+                  }`}
+                  title={isSidebarOpen ? "Collapse Recent Summaries" : "Expand Recent Summaries"}
+                >
+                  <History className={`w-3.5 h-3.5 ${isSidebarOpen ? "animate-pulse text-cyan-400" : ""}`} />
+                  <span className="text-[10px] font-bold">
+                    <span className="hidden xl:inline">History </span>({history.length})
+                  </span>
+                </button>
               </div>
             )}
 
@@ -1094,27 +1152,78 @@ export default function App() {
             }`}>
               {summaryResult ? (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                  
-                  {/* COMPRESS QUALITY STATS INSIGHTS (if source text exists) */}
-                  {sourceText && (
-                    <div className={`border-b px-4 py-3 flex items-center justify-between text-[11px] font-medium transition-colors ${
-                      theme === "light"
-                        ? "bg-slate-50/50 border-slate-100 text-slate-500"
-                        : "bg-[#0c0f16] border-white/5 text-slate-400"
-                    }`}>
+                  {/* COMPRESS QUALITY STATS INSIGHTS */}
+                  <div className={`border-b px-4 py-3 flex flex-row items-center justify-between text-[11px] font-medium transition-colors ${
+                    theme === "light"
+                      ? "bg-slate-50/50 border-slate-100 text-slate-500"
+                      : "bg-[#0c0f16] border-white/5 text-slate-400"
+                  }`}>
+                    {sourceText ? (
                       <div className="flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5 text-cyan-500" />
                         <span>Executive Digest efficiency:</span>
                       </div>
-                      <div className={`font-bold border px-2 py-0.5 rounded-full transition-colors ${
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-slate-400 uppercase tracking-wider text-[10px] font-bold font-mono">
+                        Summary Result
+                      </div>
+                    )}
+
+                    {sourceText && (
+                      <div className={`font-bold border px-2.5 py-0.5 rounded-full transition-colors shrink-0 ${
                         theme === "light"
                           ? "text-cyan-700 bg-cyan-50 border-cyan-200"
                           : "text-cyan-400 bg-cyan-950/40 border-cyan-500/20"
                       }`}>
                         {compressedRatio}% Condensed
                       </div>
+                    )}
+                  </div>
+
+                  {/* TOOLBAR ACTION CONTROLS */}
+                  <div className={`border-b px-4 py-2 flex flex-row items-center justify-end transition-colors ${
+                    theme === "light"
+                      ? "bg-slate-50/20 border-slate-100/50"
+                      : "bg-white/[0.01] border-white/5"
+                  }`}>
+                    <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
+                      <button
+                        onClick={() => handleCopyToClipboard("markdown")}
+                        className={`px-2.5 py-1.5 border rounded-lg text-[10px] font-bold shadow-sm transition-colors flex items-center gap-1 cursor-pointer ${
+                          theme === "light"
+                            ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-cyan-600"
+                            : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.07] hover:text-cyan-400"
+                        }`}
+                        title="Copy Raw Markdown code"
+                      >
+                        {copiedType === "markdown" ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                        <span>MD</span>
+                      </button>
+                      <button
+                        onClick={() => handleCopyToClipboard("plain")}
+                        className={`px-2.5 py-1.5 border rounded-lg text-[10px] font-bold shadow-sm transition-colors flex items-center gap-1 cursor-pointer ${
+                          theme === "light"
+                            ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-cyan-600"
+                            : "bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.07] hover:text-cyan-400"
+                        }`}
+                        title="Copy clean normalized text"
+                      >
+                        {copiedType === "plain" ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                        <span>Text</span>
+                      </button>
+                      <button
+                        onClick={handleDownloadFile}
+                        className={`p-1.5 border rounded-lg shadow-sm transition-colors cursor-pointer ${
+                          theme === "light"
+                            ? "bg-white border-slate-200 text-cyan-600 hover:bg-slate-50 hover:text-cyan-700"
+                            : "bg-white/[0.03] border-white/10 text-cyan-400 hover:bg-cyan-950/20"
+                        }`}
+                        title="Download summary report (.md)"
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                  )}
+                  </div>
 
                   {/* Render content panels */}
                   <div className={`flex-1 overflow-y-auto p-6 custom-scrollbar transition-colors ${
