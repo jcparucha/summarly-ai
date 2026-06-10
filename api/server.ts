@@ -91,7 +91,7 @@ app.post("/api/summarize", async (req, res) => {
       summaryLength === "short"
         ? "Ultra-concise (1-2 sentences overview, 3-5 high-level bullets)."
         : summaryLength === "detailed"
-        ? "Comprehensive deep-dive (detailed explanations, comprehensive breakdown, tables or quotes where applicable)."
+        ? "Comprehensive deep-dive (detailed explanations, comprehensive breakdown, or quotes where applicable)."
         : "Standard balanced overview (3-4 dense topics with moderate bullet density)."
     }`;
     promptText += `\n3. **Content Focus**: ${
@@ -107,7 +107,8 @@ app.post("/api/summarize", async (req, res) => {
 
     promptText += `\n\n**Mandatory Instructions**:`;
     promptText += `\n- Start the summary with a concise, descriptive title prefixed by a Level 2 Markdown Header (##). Do NOT use Level 1 Header (#).`;
-    promptText += `\n- Utilize custom formatted Markdown styles dynamically: headers (##, ###), nested bullets, bolding for emphasis, italics for sub-context, and inline code blocks (\`code\`) for technical details, definitions, variables, or variables.`;
+    promptText += `\n- Utilize custom formatted Markdown styles dynamically: headers (##, ###), nested bullets, bolding for emphasis, italics for sub-context, and inline code blocks (\`code\`) for technical details, definitions, variables.`;
+    promptText += `\n- **STRICTLY EXCLUDE ALL TABLES**: Do not use Markdown table syntax, tables, or grid layouts in the summary output. If numerical or tabular comparison is required, convert and format them using nested bullet points or structured text.`;
     promptText += `\n- Ensure perfect structural formatting. Make it scannable, engaging, and professional.`;
 
     parts.push({ text: promptText });
@@ -116,6 +117,7 @@ app.post("/api/summarize", async (req, res) => {
 Your job is to read complex inputs (which could be plaintext, tables, technical files, raw document transcripts, or scanned pages/diagrams) and distill them into highly structured, incredibly readable, visually premium Summaries.
 Always organize the layout logically with sub-headings, rich formatting (bold, italic, code-blocks), and structured bullet points.
 Never output a plain paragraph wall of text.
+Never generate any Markdown tables or table schemas. If you need to make comparative tables or show statistics, convert and display them strictly as elegant bullet points or key-value segments.
 Make extensive use of bold words to anchor readability.`;
 
     // Execute server-side Gemini call with highly robust fallback cascade to handle model overloading or demand spikes
