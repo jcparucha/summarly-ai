@@ -278,11 +278,6 @@ export default function App() {
 
   // Submit trigger to backend express service
   const handleSummarizeSubmit = async () => {
-    if (remainingUploads <= 0) {
-      setErrorMessage("Your Gemini Flash allowance is completely exhausted. Please click Reset to restore your allowance!");
-      return;
-    }
-
     if (!sourceText.trim() && !uploadedFile) {
       setErrorMessage("Please input copied text or upload a document to proceed.");
       return;
@@ -332,13 +327,6 @@ export default function App() {
       setSummaryResult(data.summary);
       setOutputTab("formatted");
       setCountdown(20);
- 
-      // Decrement dynamic Gemini Flash quota allowance remaining
-      setRemainingUploads((prev) => {
-        const nextVal = Math.max(0, prev - 1);
-        localStorage.setItem("summarly_remaining_uploads", nextVal.toString());
-        return nextVal;
-      });
  
       // Save to recent logs history
       const title = extractTitle(data.summary);
