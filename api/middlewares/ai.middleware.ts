@@ -8,10 +8,9 @@ export function validateGeminiAPIKey(
   next: NextFunction,
 ) {
   if (!process.env.GEMINI_API_KEY) {
-    res.status(500).json({ error: appMessages.error.required_gemini_key });
-
-    // stop executing
-    return;
+    return res
+      .status(500)
+      .json({ error: appMessages.error.required_gemini_key });
   }
 
   next();
@@ -46,9 +45,7 @@ export function validateInputs(
       });
     });
 
-    res.status(422).json(errors);
-
-    return;
+    return res.status(422).json(errors);
   }
 
   next();
