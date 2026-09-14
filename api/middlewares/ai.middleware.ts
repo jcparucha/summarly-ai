@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { SummarizeSchema } from "../schemas/ai.schema";
-import { errorMessages } from "../lang/validation";
+import { appMessages } from "../lang/app";
 
 export function validateGeminiAPIKey(
   req: Request,
@@ -8,13 +8,11 @@ export function validateGeminiAPIKey(
   next: NextFunction,
 ) {
   if (!process.env.GEMINI_API_KEY) {
-    res.status(500).json({ error: errorMessages.general.required.gemini_key });
+    res.status(500).json({ error: appMessages.error.required_gemini_key });
 
     // stop executing
     return;
   }
-
-  console.log(process.env.GEMINI_API_KEY);
 
   next();
 }

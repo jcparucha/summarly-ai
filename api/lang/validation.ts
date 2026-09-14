@@ -5,13 +5,7 @@ import {
   SUMMARY_TONE_OPTIONS,
 } from "../types/ai.types";
 
-export const errorMessages = {
-  general: {
-    required: {
-      gemini_key:
-        "GEMINI_API_KEY environment variable is not defined on the server.",
-    },
-  },
+export const validationMessages = {
   summary: {
     required: {
       text_file: "Either text or file must be provided.",
@@ -22,5 +16,9 @@ export const errorMessages = {
         tone: `The Options.tone should either be: ${SUMMARY_TONE_OPTIONS.join(", ")}.`,
       },
     },
+    invalid_file: "File data must be a valid data URI.",
+    max_size: "File size exceeds the maximum limit of 20MB.",
+    mime_type: "The file should be PNG, JPEG, and PDF only.",
+    same_mime_type: "Data URI mimeType does not match provided mimeType.",
   },
 };
