@@ -7,7 +7,7 @@ export enum SummaryFocus {
 
 export enum SummaryFormat {
   BULLETS = "bullets",
-  ELI5 = "ELI5", // explain like Im 5
+  ELI5 = "eli5", // explain like Im 5
   EXECUTIVE_SUMMARY = "executive_summary",
   KEY_POINTS = "key_points_per_topic",
 }
