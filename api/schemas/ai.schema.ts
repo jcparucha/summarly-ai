@@ -60,7 +60,9 @@ export const SummarizeSchema = z
       }),
     }),
   })
-  .refine(({ file, text }) => file !== undefined || text !== undefined, {
-    error: summaryRequired.text_file,
-    path: ["text"],
-  });
+  .refine(
+    // validate either file or text is provided and not both
+    ({ file, text }) =>
+      (file !== undefined || text !== undefined) && !(file && text),
+    { error: summaryRequired.text_file, path: ["text"] },
+  );
