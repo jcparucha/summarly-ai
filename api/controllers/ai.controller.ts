@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { generateSummary } from "../services/ai.service";
-import { appMessages } from "../lang/app";
-import { getErrorStatusCode } from "../utils/error-handler.util";
+import { generateSummary } from "../services/ai.service.js";
+import { appMessages } from "../lang/app.js";
+import { getErrorStatusCode } from "../utils/error-handler.util.js";
 
 const ping = (req: Request, res: Response) => {
   res.json({ message: "PONG" });

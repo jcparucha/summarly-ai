@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { SummarizeSchema } from "../schemas/ai.schema";
-import { appMessages } from "../lang/app";
+import { SummarizeSchema } from "../schemas/ai.schema.js";
+import { appMessages } from "../lang/app.js";
 
 export function validateGeminiAPIKey(
   req: Request,

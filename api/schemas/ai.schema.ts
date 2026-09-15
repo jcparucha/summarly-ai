@@ -4,8 +4,8 @@ import {
   SUMMARY_FORMAT_OPTIONS,
   SUMMARY_LENGTH_OPTIONS,
   SUMMARY_TONE_OPTIONS,
-} from "../types/ai.types";
-import { validationMessages } from "../lang/validation";
+} from "../types/ai.types.js";
+import { validationMessages } from "../lang/validation.js";
 
 const MAX_FILE_LIMIT = 20 * 1024 * 1024; // 20mb
 

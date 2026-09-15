@@ -1,11 +1,11 @@
-import { GEMINI_MODELS } from "../config/ai.config";
-import { appMessages } from "../lang/app";
-import { getGeminiClient } from "../libraries/gemini";
-import { SummaryOptions } from "../types/ai.types";
+import { GEMINI_MODELS } from "../config/ai.config.js";
+import { appMessages } from "../lang/app.js";
+import { getGeminiClient } from "../libraries/gemini.js";
+import { SummaryOptions } from "../types/ai.types.js";
 import {
   generateSummaryPrompt,
   SYSTEM_INSTRUCTION,
-} from "../utils/prompt-builder.util";
+} from "../utils/prompt-builder.util.js";
 
 type FileData = {
   data: string;

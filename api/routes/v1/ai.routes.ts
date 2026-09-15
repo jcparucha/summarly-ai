@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ping, summarize } from "../../controllers/ai.controller";
+import { ping, summarize } from "../../controllers/ai.controller.js";
 import {
   validateGeminiAPIKey,
   validateInputs,

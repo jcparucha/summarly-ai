@@ -1,5 +1,5 @@
 import express, { Application } from "express";
-import v1Routes from "./routes/v1.routes";
+import v1Routes from "./routes/v1.routes.js";
 import dotenv from "dotenv";
 
 dotenv.config();

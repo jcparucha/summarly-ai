@@ -4,7 +4,7 @@ import {
   SummaryLength,
   SummaryOptions,
   SummaryTone,
-} from "../types/ai.types";
+} from "../types/ai.types.js";
 
 const OPTIONS_FOCUS_PROMPT: Record<SummaryFocus, string> = {
   [SummaryFocus.ACTION_ITEMS]:

@@ -3,7 +3,7 @@ import {
   SUMMARY_FORMAT_OPTIONS,
   SUMMARY_LENGTH_OPTIONS,
   SUMMARY_TONE_OPTIONS,
-} from "../types/ai.types";
+} from "../types/ai.types.js";
 
 export const validationMessages = {
   summary: {

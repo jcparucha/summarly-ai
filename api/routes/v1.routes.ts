@@ -1,5 +1,5 @@
 import { Router } from "express";
-import aiRoute from "./v1/ai.routes";
+import aiRoute from "./v1/ai.routes.js";
 
 const router = Router();
 
