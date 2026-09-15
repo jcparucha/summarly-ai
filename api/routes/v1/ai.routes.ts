@@ -3,7 +3,7 @@ import { ping, summarize } from "../../controllers/ai.controller.js";
 import {
   validateGeminiAPIKey,
   validateInputs,
-} from "@/api/middlewares/ai.middleware";
+} from "../../middlewares/ai.middleware.js";
 
 const router = Router();
 
